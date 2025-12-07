@@ -1,0 +1,5 @@
+FROM mongo:6.0
+
+ENV MONGO_INITDB_DATABASE=revtickets
+
+EXPOSE 27017

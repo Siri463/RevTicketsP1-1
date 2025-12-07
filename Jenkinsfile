@@ -10,6 +10,7 @@ pipeline {
         DOCKER_IMAGE_BACKEND = 'shashank092/revtickets-backend'
         DOCKER_IMAGE_FRONTEND = 'shashank092/revtickets-frontend'
         DOCKER_IMAGE_DB = 'shashank092/revtickets-mysql'
+        DOCKER_IMAGE_MONGO = 'shashank092/revtickets-mongodb'
         DOCKER_TAG = "${BUILD_NUMBER}"
     }
     
@@ -73,6 +74,18 @@ pipeline {
             }
         }
         
+        stage('Build MongoDB Docker Image') {
+            when {
+                expression { return fileExists('C:\\Program Files\\Docker\\Docker\\Docker Desktop.exe') }
+            }
+            steps {
+                dir('mongodb') {
+                    bat "docker build -t ${DOCKER_IMAGE_MONGO}:${DOCKER_TAG} ."
+                    bat "docker tag ${DOCKER_IMAGE_MONGO}:${DOCKER_TAG} ${DOCKER_IMAGE_MONGO}:latest"
+                }
+            }
+        }
+        
         stage('Push to Registry') {
             when {
                 expression { return fileExists('C:\\Program Files\\Docker\\Docker\\Docker Desktop.exe') }
@@ -86,6 +99,8 @@ pipeline {
                     bat "docker push ${DOCKER_IMAGE_FRONTEND}:latest"
                     bat "docker push ${DOCKER_IMAGE_DB}:${DOCKER_TAG}"
                     bat "docker push ${DOCKER_IMAGE_DB}:latest"
+                    bat "docker push ${DOCKER_IMAGE_MONGO}:${DOCKER_TAG}"
+                    bat "docker push ${DOCKER_IMAGE_MONGO}:latest"
                 }
             }
         }

@@ -2,24 +2,27 @@ version: '3.8'
 
 services:
   mysql:
-    image: mysql:8.0
+    image: shashank092/revtickets-mysql:latest
+    container_name: revtickets-mysql
+    ports:
+      - "3306:3306"
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: revticketsnew
-    ports:
-      - "3306:3306"
-    volumes:
-      - mysql-data:/var/lib/mysql
+    networks:
+      - revtickets-network
 
   mongodb:
-    image: mongo:6.0
+    image: shashank092/revtickets-mongodb:latest
+    container_name: revtickets-mongodb
     ports:
       - "27017:27017"
-    volumes:
-      - mongo-data:/data/db
+    networks:
+      - revtickets-network
 
   backend:
-    image: revtickets-backend:latest
+    image: shashank092/revtickets-backend:latest
+    container_name: revtickets-backend
     ports:
       - "8080:8080"
     depends_on:
@@ -27,8 +30,20 @@ services:
       - mongodb
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/revticketsnew
-      SPRING_DATA_MONGODB_URI: mongodb://mongodb:27017/revtickets
+      SPRING_DATA_MONGODB_HOST: mongodb
+    networks:
+      - revtickets-network
 
-volumes:
-  mysql-data:
-  mongo-data:
+  frontend:
+    image: shashank092/revtickets-frontend:latest
+    container_name: revtickets-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - revtickets-network
+
+networks:
+  revtickets-network:
+    driver: bridge

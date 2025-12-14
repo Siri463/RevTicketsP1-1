@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 
 declare var Razorpay: any;
@@ -95,13 +95,8 @@ export class PaymentComponent implements OnInit {
       console.log('Regular show payment request:', paymentRequest);
     }
 
-    const token = localStorage.getItem('token');
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    });
-
-    this.http.post<any>(`${environment.apiUrl}/payments/create-order`, paymentRequest, { headers })
+    // Let the auth interceptor handle the Authorization header
+    this.http.post<any>(`${environment.apiUrl}/payments/create-order`, paymentRequest)
       .subscribe({
         next: (response) => {
           if (response.success) {
@@ -173,13 +168,8 @@ export class PaymentComponent implements OnInit {
       bookingId: bookingId
     };
 
-    const token = localStorage.getItem('token');
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    });
-
-    this.http.post<any>(`${environment.apiUrl}/payments/verify`, verifyRequest, { headers })
+    // Let the auth interceptor handle the Authorization header
+    this.http.post<any>(`${environment.apiUrl}/payments/verify`, verifyRequest)
       .subscribe({
         next: (response) => {
           this.loading = false;
@@ -223,13 +213,8 @@ export class PaymentComponent implements OnInit {
   }
 
   cancelPayment(bookingId: number) {
-    const token = localStorage.getItem('token');
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    });
-
-    this.http.post<any>(`${environment.apiUrl}/payments/cancel/${bookingId}`, {}, { headers })
+    // Let the auth interceptor handle the Authorization header
+    this.http.post<any>(`${environment.apiUrl}/payments/cancel/${bookingId}`, {})
       .subscribe({
         next: (response) => {
           console.log('Payment cancelled:', response);

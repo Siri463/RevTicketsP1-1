@@ -51,23 +51,27 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
-            .cors(cors -> cors.configure(http))
+            .cors(cors -> {}) // CORS is configured in WebConfig
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                // Public endpoints
+                // Public endpoints - no authentication required
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/movies/**").permitAll()
                 .requestMatchers("/api/events/**").permitAll()
                 .requestMatchers("/api/shows/**").permitAll()
+                .requestMatchers("/api/seats/**").permitAll()
                 .requestMatchers("/api/venues/**").permitAll()
                 .requestMatchers("/api/banners/**").permitAll()
                 .requestMatchers("/api/reviews/**").permitAll()
                 .requestMatchers("/api/health/**").permitAll()
                 .requestMatchers("/public/**").permitAll()
-                .requestMatchers("/display/**").permitAll()  // Allow static image access
-                .requestMatchers("/banner/**").permitAll()   // Allow static image access
+                .requestMatchers("/display/**").permitAll()
+                .requestMatchers("/banner/**").permitAll()
                 .requestMatchers("/ws/**").permitAll()
-                // Admin endpoints
+                // Authenticated user endpoints
+                .requestMatchers("/api/bookings/**").authenticated()
+                .requestMatchers("/api/payments/**").authenticated()
+                // Admin only endpoints
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 // All other requests need authentication
                 .anyRequest().authenticated()
